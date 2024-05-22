@@ -169,10 +169,10 @@ _texture( bias_tex,int2);
             engv[ii] = energy;                                              \
     }
 
-#define local_allocate_store_answer_pinn_adp()                              \
+#define local_allocate_store_answer_anna_adp()                              \
     __local acctyp red_acc[6][BLOCK_PAIR];
 
-#define store_answer_pinn_adp(f, energy, virial, ii, inum,                  \
+#define store_answer_anna_adp(f, energy, virial, ii, inum,                  \
                               tid, e_base, t_per_atom,                      \
                               offset, eflag, vflag, ans, engv)              \
     if (t_per_atom > 1) {                                                   \
@@ -317,9 +317,9 @@ _texture( bias_tex,int2);
             engv[ii] =  energy;                                             \
     }
 
-#define local_allocate_store_answer_pinn_adp()
+#define local_allocate_store_answer_anna_adp()
 
-#define store_answer_pinn_adp(f, energy, virial, ii, inum,                  \
+#define store_answer_anna_adp(f, energy, virial, ii, inum,                  \
                               tid, e_base, t_per_atom,                      \
                               offset, eflag, vflag, ans, engv)              \
     if(t_per_atom > 1) {                                                    \
@@ -357,7 +357,7 @@ _texture( bias_tex,int2);
 //---------------------------------------------------------------------
 	                // get the short neighbor list
 //----------------------------------------------------------------------
-__kernel void k_pinn_adp_short_nbor(const __global numtyp4* restrict x_, 
+__kernel void k_anna_adp_short_nbor(const __global numtyp4* restrict x_, 
 									const numtyp cutMax, const int ntypes, 
 									__global int* dev_nbor, 
 									const int nbor_pitch, 
@@ -639,10 +639,10 @@ __kernel void k_energy(const __global numtyp4* restrict x_, const __global int* 
 //----------------------------------------------------------------------
 			// force of atom i and energy of pair part
 //----------------------------------------------------------------------
-__kernel void k_pinn_adp(const __global numtyp4* restrict x_, const int ntypes, 
+__kernel void k_anna_adp(const __global numtyp4* restrict x_, const int ntypes, 
 						 const int t_per_atom, const __global int* dev_nbor,
 						 const __global int* dev_packed, const int nbor_pitch,
-						 __global acctyp4 *ans, __global acctyp* restrict engv,
+						 __global acctyp3 *ans, __global acctyp* restrict engv,
 						 const int eflag, const int vflag, const int inum,
 						 const __global numtyp* gadp_params, const numtyp2 adp_const,
 						 const int nall, const __global numtyp* restrict adp_rho,
@@ -650,7 +650,7 @@ __kernel void k_pinn_adp(const __global numtyp4* restrict x_, const int ntypes,
 						 const __global numtyp* restrict adp_lambda,
 						 const __global numtyp* restrict ladp_params) {
 	
-	local_allocate_store_answer_pinn_adp();
+	local_allocate_store_answer_anna_adp();
 	numtyp e_base = adp_const.x;																
 	numtyp cutMax = adp_const.y;
 	numtyp Rc = ucl_sqrt(cutMax);
@@ -672,7 +672,7 @@ __kernel void k_pinn_adp(const __global numtyp4* restrict x_, const int ntypes,
 	numtyp d3 = gadp_params[15];
 	numtyp q3 = gadp_params[16];	
 
-	acctyp4 f;	f.x = (acctyp)0.0; f.y = (acctyp)0.0; f.z = (acctyp)0.0;
+	acctyp3 f;	f.x = (acctyp)0.0; f.y = (acctyp)0.0; f.z = (acctyp)0.0;
 	acctyp fx, fy, fz, fxi, fyi, fzi, fxj, fyj, fzj;
 	acctyp energy = (acctyp)0.0;
 	acctyp virial[6] = { 0.0 };																		
@@ -799,6 +799,6 @@ __kernel void k_pinn_adp(const __global numtyp4* restrict x_, const int ntypes,
 				virial[5] += y * fz;
 			}
 		}
-		store_answer_pinn_adp(f, energy, virial, ii, inum, tid, e_base, t_per_atom, offset, eflag, vflag, ans, engv);
+		store_answer_anna_adp(f, energy, virial, ii, inum, tid, e_base, t_per_atom, offset, eflag, vflag, ans, engv);
 	}
 }
